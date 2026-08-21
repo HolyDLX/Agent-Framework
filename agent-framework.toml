@@ -1,0 +1,27 @@
+[project]
+name = "agent-framework"
+python_version = "3.12"
+source_paths = ["configure.py", "tools"]
+test_paths = ["tests"]
+docs_path = "docs"
+readme = "README.md"
+
+[verification]
+coverage_min = 0
+line_length = 88
+coverage_exclude_paths = [
+    "tools/run_actionlint.py",
+    "tools/run_black.py",
+    "tools/run_contracts.py",
+    "tools/run_coverage.py",
+    "tools/run_pydoclint.py",
+    "tools/run_pyright.py",
+    "tools/run_pytest.py",
+    "tools/run_ruff.py",
+    "tools/run_shellcheck.py",
+    "tools/run_linkcheck.py",
+    "tools/run_markdownlint.py",
+    "tools/run_verification.py",
+    "tools/run_yamllint.py",
+]
+exclude_paths = [".git", ".venv", "coverage", "templates"]

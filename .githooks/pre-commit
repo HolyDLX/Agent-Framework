@@ -1,0 +1,58 @@
+#!/bin/sh
+set -eu
+
+# Git for Windows/MSYS rewrites POSIX-looking Docker arguments such as
+# /workspace into Windows paths. Docker must receive container paths unchanged.
+case "$(uname -s 2>/dev/null || true)" in
+    MINGW*|MSYS*|CYGWIN*)
+        export MSYS_NO_PATHCONV=1
+        ;;
+esac
+
+# Agent Framework repository-only verification hook.
+# This file is intentionally not part of templates/ and is not installed into
+# consuming projects.
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+if ! docker info >/dev/null 2>&1; then
+    echo "Agent Framework pre-commit verification requires a running Docker service." >&2
+    exit 125
+fi
+
+BASE_IMAGE="agent-framework-python:3.12-local"
+PROJECT_IMAGE="agent-agent-framework-development"
+
+printf '%s\n' "== Agent Framework pre-commit: build controlled verification images =="
+docker build \
+    --build-arg "PYTHON_VERSION=3.12" \
+    --tag "$BASE_IMAGE" \
+    --file container/Dockerfile \
+    container
+
+docker build \
+    --tag "$PROJECT_IMAGE" \
+    --build-arg "AGENT_FRAMEWORK_BASE_IMAGE=$BASE_IMAGE" \
+    --file Dockerfile \
+    .
+
+case "$(uname -s 2>/dev/null || true)" in
+    MINGW*|MSYS*|CYGWIN*)
+        # Git for Windows executes Git hooks through its POSIX shell. Docker
+        # expects a Windows host path for bind mounts.
+        HOST_ROOT="$(pwd -W)"
+        ;;
+    *)
+        HOST_ROOT="$(pwd -P)"
+        ;;
+esac
+
+printf '%s\n' "== Agent Framework pre-commit: complete verification =="
+docker run --rm \
+    --memory 512m \
+    --cpus 2 \
+    --mount "type=bind,source=$HOST_ROOT,target=/workspace" \
+    --workdir /workspace \
+    "$PROJECT_IMAGE" \
+    python tools/run_verification.py --fix

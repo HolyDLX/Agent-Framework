@@ -1,0 +1,10 @@
+"""Minimal executable scaffold for ${display_name}."""
+
+
+def main() -> None:
+    """Run the replaceable project scaffold."""
+    print("Hello from ${display_name}!")
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()

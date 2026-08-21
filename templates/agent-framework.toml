@@ -1,0 +1,23 @@
+# Supported inputs from the consuming project to Agent Framework.
+# Add new project-specific engineering needs here only after the framework has
+# explicitly defined their semantics.
+
+[project]
+name = "${distribution_name}"
+python_version = "${python_version}"
+source_paths = ["src"]
+test_paths = ["tests"]
+docs_path = "docs"
+readme = "README.md"
+
+[verification]
+coverage_min = 90
+line_length = 88
+# Files listed here are omitted from the coverage denominator and reports.
+coverage_exclude_paths = []
+exclude_paths = [
+    ".git",
+    ".venv",
+    "agent-framework",
+    "coverage",
+]
