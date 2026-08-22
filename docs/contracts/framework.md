@@ -150,6 +150,10 @@ Type: `behavioral`
 shall be reported as successfully skipped rather than failed.
 Type: `behavioral`
 
+**AF-TOOL-014** - Aggregate verification shall finish with a concise result
+line that reports overall success or the number of failed category runs.
+Type: `behavioral`
+
 **AF-BOOT-011** - Project configuration shall require an explicitly selected,
 discoverable bootstrap profile and the `generic` profile shall create the
 minimal executable scaffold with its declared initial tool assignments.

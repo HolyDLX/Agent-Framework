@@ -183,9 +183,9 @@ def test_latest_log_is_replaced_and_failure_tail_is_uninterpreted(
     assert capsys.readouterr().out == "second\nthird\n"
 
 
-@covers("AF-TOOL-008")
+@covers("AF-TOOL-008", "AF-TOOL-014")
 def test_aggregate_runs_all_fixes_before_all_verifications(
-    tmp_path: Path, monkeypatch: MonkeyPatch
+    tmp_path: Path, monkeypatch: MonkeyPatch, capsys: CaptureFixture[str]
 ):
     _config(
         tmp_path,
@@ -208,6 +208,23 @@ def test_aggregate_runs_all_fixes_before_all_verifications(
         "verify_documentation.py",
         "verify_code.py",
     ]
+    assert "Result: FAIL (1 of 4 category runs failed)" in capsys.readouterr().out
+
+
+@covers("AF-TOOL-014")
+def test_aggregate_prints_final_success_result(
+    tmp_path: Path, monkeypatch: MonkeyPatch, capsys: CaptureFixture[str]
+):
+    _config(tmp_path, '[tools.code]\nenabled = ["code/black"]\n')
+
+    def fake_capture(command: list[str], **_kwargs: object) -> CommandResult:
+        return CommandResult(0, "", 0.1)
+
+    monkeypatch.setattr(run_verification, "project_root", lambda: tmp_path)
+    monkeypatch.setattr(run_verification, "capture", fake_capture)
+
+    assert run_verification.run_configured([]) == 0
+    assert capsys.readouterr().out.rstrip().endswith("Result: PASS (1 category run)")
 
 
 @covers("AF-TOOL-009")

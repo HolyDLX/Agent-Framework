@@ -20,6 +20,10 @@ milestone.
 - The consuming root contains only `.git`, `.gitmodules`, `agent-framework`, and
   entries matched by the framework's template `.gitignore`.
 
+Matched IDE, virtual-environment, cache, coverage, and build paths are tolerated
+pre-existing state, not expected bootstrap state. Preserve and report them; do
+not remove them automatically.
+
 Adding and committing `.gitmodules` and the submodule gitlink before bootstrap
 is recommended but not enforced.
 
@@ -37,8 +41,12 @@ is recommended but not enforced.
    the selected version:
 
    ```text
-   docker build --build-arg PYTHON_VERSION=<python-version> --tag agent-framework-python:<python-version>-local --file agent-framework/container/Dockerfile agent-framework/container
+   docker build --quiet --build-arg PYTHON_VERSION=<python-version> --tag agent-framework-python:<python-version>-local --file agent-framework/container/Dockerfile agent-framework/container
    ```
+
+   `--quiet` suppresses successful BuildKit progress noise. If the build fails
+   without sufficient diagnostics, rerun the same command once without
+   `--quiet` and report the raw failure output.
 
 6. Run the canonical configuration command inside the framework image. Pass the
    developer's intent verbatim.
@@ -57,6 +65,8 @@ is recommended but not enforced.
 
    The Linux identity mapping prevents root-owned files in the bind-mounted
    repository. Linux is supported but not the primary tested bootstrap host.
+   Windows and Linux commands remain separate because Linux requires explicit
+   UID/GID mapping while Docker Desktop on Windows does not.
 7. If configuration fails, report its complete preflight explanation. Do not
    delete conflicts or retry with destructive cleanup. Ignored IDE, virtual
    environment, cache, coverage, and build paths may be preserved with a
@@ -78,8 +88,15 @@ is recommended but not enforced.
 13. Build the consuming project's development image:
 
     ```text
-    docker build --tag <project-development-image> --build-arg AGENT_FRAMEWORK_BASE_IMAGE=agent-framework-python:<python-version>-local .
-    ```
+
+   docker build --quiet --tag <project-development-image> --build-arg AGENT_FRAMEWORK_BASE_IMAGE=agent-framework-python:<python-version>-local .
+
+   ```
+
+   The deterministic project image name is
+   `agent-<distribution-name>-development`; configuration prints the resolved
+   name. As with the base image, rerun a failed build without `--quiet` only
+   when more diagnostics are needed.
 
 14. Run complete verification inside the project image.
 

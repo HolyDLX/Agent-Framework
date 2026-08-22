@@ -72,7 +72,8 @@ def run_configured(arguments: list[str]) -> int:
         return 2
 
     phases = ["fix", "verify"] if parsed.fix else ["verify"]
-    failed = False
+    failed_runs = 0
+    total_runs = 0
     aggregate: list[str] = []
     for operation in phases:
         print(f"\n{operation.title()} phase:")
@@ -92,18 +93,23 @@ def run_configured(arguments: list[str]) -> int:
             aggregate.extend(("", summary, result.output.rstrip()))
             if parsed.verbose and result.output:
                 print(result.output, end="" if result.output.endswith("\n") else "\n")
-            failed = failed or result.returncode != 0
+            total_runs += 1
+            failed_runs += result.returncode != 0
 
     try:
         write_latest(log_path, "\n".join(aggregate).rstrip() + "\n")
     except OSError as exc:
         print(f"WARNING: Could not write log {log_path}: {exc}")
-    if failed:
+    if failed_runs:
         if not parsed.verbose:
             print("\nLast 40 log lines:")
             print_tail("\n".join(aggregate))
         print(f"\nComplete log: {log_path.relative_to(root)}")
-    return 1 if failed else 0
+        print(f"\nResult: FAIL ({failed_runs} of {total_runs} category runs failed)")
+        return 1
+    noun = "category run" if total_runs == 1 else "category runs"
+    print(f"\nResult: PASS ({total_runs} {noun})")
+    return 0
 
 
 def main() -> int:

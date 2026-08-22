@@ -249,6 +249,15 @@ Method: `automated-test`
 Run a non-applicable tool and a category fix phase containing a verify-only
 tool. Verify both produce successful skip results with reasons.
 
+## EA-AF-TOOL-014
+
+Requirements: `AF-TOOL-014`
+Method: `automated-test`
+
+Run successful and failing aggregate verification scenarios. Verify the final
+result line reports overall success for the successful run and the failed and
+total category-run counts for the failing run.
+
 ## EA-AF-BOOT-011
 
 Requirements: `AF-BOOT-011`

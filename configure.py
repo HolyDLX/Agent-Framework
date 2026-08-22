@@ -324,6 +324,9 @@ def configure(
         print("WARNING: Preserving ignored pre-existing paths:")
         for path in ignored:
             print(f"  {path}")
+        print(
+            "These paths are tolerated pre-existing state, not required bootstrap state."
+        )
     if submodule_warning:
         print(f"WARNING: {submodule_warning}.")
 
@@ -353,6 +356,8 @@ def configure(
     print(f"Import package:    {package_name}")
     print(f"Python version:    {python_version}")
     print(f"Bootstrap profile: {profile.strip().lower()}")
+    print(f"Development image: agent-{distribution_name}-development")
+    print(f"Generated files:   {len(created_files)}")
 
 
 def main() -> int:
