@@ -10,10 +10,10 @@ redefine a conflicting contract.
 
 The documentation model deliberately separates:
 
-- **requirements** — independently assessable obligations;
-- **application notes** — authoritative guidance, examples, rationale, and
+- **requirements** - independently assessable obligations;
+- **application notes** - authoritative guidance, examples, rationale, and
   deliberate non-guarantees without independent coverage targets;
-- **evaluation activities** — suitable evidence for deciding whether a
+- **evaluation activities** - suitable evidence for deciding whether a
   requirement is satisfied.
 
 This is a lightweight evaluation-oriented structure inspired by useful Common
@@ -40,7 +40,7 @@ Do not assign IDs to prose merely because it contains normative language.
 Use a stable machine-parseable declaration:
 
 ```markdown
-**MOD-AREA-001** — The externally observable requirement text.
+**MOD-AREA-001** - The externally observable requirement text.
 Type: `behavioral`
 ```
 
@@ -48,9 +48,9 @@ The declaration starts with a bold ID, followed by an em dash and requirement
 text. Wrapped continuation lines belong to the same requirement paragraph. The
 final line declares exactly one requirement type. Supported types are:
 
-- `behavioral` — externally observable runtime or tool behavior;
-- `structural` — repository, interface, packaging, or architecture shape;
-- `process` — required development, bootstrap, review, or operational workflow.
+- `behavioral` - externally observable runtime or tool behavior;
+- `structural` - repository, interface, packaging, or architecture shape;
+- `process` - required development, bootstrap, review, or operational workflow.
 
 Requirement type describes what kind of obligation exists. It does **not** decide
 how the requirement is evaluated. A structural or process requirement may still
@@ -103,10 +103,10 @@ An evaluation activity:
 
 Supported methods:
 
-- `automated-test` — observable behavior can be exercised reliably;
-- `inspection` — a public structural property or absence of an interface is
+- `automated-test` - observable behavior can be exercised reliably;
+- `inspection` - a public structural property or absence of an interface is
   established by inspection;
-- `analysis` — a conclusion requires reasoning across several observations.
+- `analysis` - a conclusion requires reasoning across several observations.
 
 Prefer automated tests when they can directly establish the obligation. If
 `automated-test` is the correct method but its executable evidence is
@@ -176,15 +176,15 @@ The generated traceability matrix combines requirement type, evaluation
 activities, and executable `@covers(...)` evidence. Its evaluation status uses
 these meanings:
 
-- `AUTOMATED` — all declared evaluation is automated and matching test evidence exists;
-- `MIXED` — automated evidence exists and inspection or analysis is also required;
-- `MANUAL-REVIEW` — the requirement is intentionally evaluated only by inspection
+- `AUTOMATED` - all declared evaluation is automated and matching test evidence exists;
+- `MIXED` - automated evidence exists and inspection or analysis is also required;
+- `MANUAL-REVIEW` - the requirement is intentionally evaluated only by inspection
   and/or analysis;
-- `PLANNED-AUTOMATED` — automated-test is the declared method, executable
+- `PLANNED-AUTOMATED` - automated-test is the declared method, executable
   evidence is explicitly deferred with the `Evidence:` value `planned`, and no matching
   `@covers(...)` evidence exists yet;
-- `MISSING-EVALUATION` — no evaluation activity is defined;
-- `MISSING-AUTOMATED-EVIDENCE` — an `automated-test` activity exists but no test
+- `MISSING-EVALUATION` - no evaluation activity is defined;
+- `MISSING-AUTOMATED-EVIDENCE` - an `automated-test` activity exists but no test
   claims the requirement.
 
 `MANUAL-REVIEW` is not a failure and does not mean the requirement is unmet. It

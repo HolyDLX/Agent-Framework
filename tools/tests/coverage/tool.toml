@@ -1,0 +1,5 @@
+id = "coverage"
+name = "coverage.py"
+
+[operations.verify]
+script = "run_coverage.py"

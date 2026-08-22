@@ -46,13 +46,13 @@ is recommended but not enforced.
    PowerShell/Windows:
 
    ```powershell
-   docker run --rm --mount "type=bind,source=$PWD,target=/workspace" --workdir /workspace agent-framework-python:<python-version>-local python agent-framework/configure.py --project-name "<project-name>" --intent "<initial-intent>" --python-version <python-version>
+   docker run --rm --mount "type=bind,source=$PWD,target=/workspace" --workdir /workspace agent-framework-python:<python-version>-local python agent-framework/configure.py --profile generic --project-name "<project-name>" --intent "<initial-intent>" --python-version <python-version>
    ```
 
    Bash/Linux:
 
    ```bash
-   docker run --rm --user "$(id -u):$(id -g)" --env HOME=/tmp --mount type=bind,source="$PWD",target=/workspace --workdir /workspace agent-framework-python:<python-version>-local python agent-framework/configure.py --project-name "<project-name>" --intent "<initial-intent>" --python-version <python-version>
+   docker run --rm --user "$(id -u):$(id -g)" --env HOME=/tmp --mount type=bind,source="$PWD",target=/workspace --workdir /workspace agent-framework-python:<python-version>-local python agent-framework/configure.py --profile generic --project-name "<project-name>" --intent "<initial-intent>" --python-version <python-version>
    ```
 
    The Linux identity mapping prevents root-owned files in the bind-mounted
@@ -86,13 +86,13 @@ is recommended but not enforced.
     PowerShell/Windows:
 
     ```powershell
-    docker run --rm --mount "type=bind,source=$PWD,target=/workspace" --workdir /workspace <project-development-image> python agent-framework/tools/run_verification.py --fix
+    docker run --rm --mount "type=bind,source=$PWD,target=/workspace" --workdir /workspace <project-development-image> python run_verification.py --fix
     ```
 
     Bash/Linux:
 
     ```bash
-    docker run --rm --user "$(id -u):$(id -g)" --env HOME=/tmp --mount type=bind,source="$PWD",target=/workspace --workdir /workspace <project-development-image> python agent-framework/tools/run_verification.py --fix
+    docker run --rm --user "$(id -u):$(id -g)" --env HOME=/tmp --mount type=bind,source="$PWD",target=/workspace --workdir /workspace <project-development-image> python run_verification.py --fix
     ```
 
 15. Fix only scaffold/framework integration defects required for verification.

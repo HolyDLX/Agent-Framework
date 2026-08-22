@@ -15,12 +15,17 @@ When host Python is intentionally available, the convenience dispatcher is:
 python tools/run_verification.py --container
 ```
 
-Focused groups are `code`, `docs`, `testing`, `contracts`, and `repository`.
+Configured categories execute in their `agent-framework.toml` order. The
+framework currently provides `code`, `tests`, `documentation`, `repository`,
+`contracts`, `configuration`, `shell`, and `ci`.
+
+Tool discovery and management are documented in
+[Framework tools](../../tools/README.md).
 
 ## Documentation verification
 
-The `docs` group validates project-owned Markdown directly. `markdownlint-cli2`
-checks Markdown structure and style, while `lychee --offline` verifies
+The `documentation` category validates project-owned Markdown directly.
+`markdownlint-cli2` checks Markdown structure and style, while `lychee --offline` verifies
 repository-local links and anchors without contacting external websites.
 Documentation navigation is expressed with ordinary repository-relative
 Markdown links; no generated documentation site or Sphinx/MyST metadata is

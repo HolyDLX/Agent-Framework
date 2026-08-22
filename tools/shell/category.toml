@@ -1,0 +1,3 @@
+id = "shell"
+verify = "verify_shell.py"
+fix = "fix_shell.py"

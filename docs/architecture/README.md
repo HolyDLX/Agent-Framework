@@ -36,8 +36,17 @@ does not treat `/workspace` as framework-owned state.
 
 ## Configuration model
 
-The framework is opinionated. Standard verification behavior is framework
-owned. Project differences are expressed only through supported fields in
-`agent-framework.toml`. When a legitimate project need is not representable,
-the preferred change is to extend the framework configuration model rather than
-fork the runner/tool configuration in the consuming project.
+The framework owns category and tool bundle implementations. Categories and
+tools are discovered from validated TOML manifests; consuming projects select
+ordered tool assignments in the machine-managed `[tools.*]` section of
+`agent-framework.toml`. The project-local `toolctl.py` and
+`run_verification.py` files are thin forwarding wrappers.
+
+Bundle defaults apply only when no corresponding project-local tool
+configuration exists. Deployed local defaults become project-owned and replace
+the bundle configuration as a whole. Framework updates never overwrite them
+without an explicit `reset-defaults --force` command.
+
+Bootstrap profiles select the project skeleton and initial tool assignments.
+The initial `generic` profile is explicit and creates the minimal executable
+Python scaffold.

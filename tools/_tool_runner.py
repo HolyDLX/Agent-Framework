@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+import os
 import shutil
 import subprocess
 import sys
@@ -17,6 +19,26 @@ from container.local_execution import (
 )
 
 
+def _write_result(status: str, reason: str | None = None) -> None:
+    path = os.environ.get("AGENT_FRAMEWORK_RESULT_FILE")
+    if not path:
+        return
+    result_path = Path(path)
+    if result_path.exists():
+        return
+    result_path.write_text(
+        json.dumps({"status": status, "reason": reason}), encoding="utf-8"
+    )
+
+
+def skip(reason: str) -> int:
+    """Report a successful non-applicable tool invocation."""
+
+    print(reason)
+    _write_result("skip", reason)
+    return 0
+
+
 def _run_tool(
     script: Path, local_runner: Callable[[list[str]], int], defaults: Sequence[str]
 ) -> int:
@@ -28,7 +50,9 @@ def _run_tool(
             return run_in_container(script, arguments or list(defaults))
     if not is_running_in_container():
         assert_local_execution_allowed()
-    return local_runner(arguments or list(defaults))
+    result = local_runner(arguments or list(defaults))
+    _write_result("pass" if result == 0 else "fail")
+    return result
 
 
 def run_python_tool(script: Path, module: str, defaults: Sequence[str]) -> int:

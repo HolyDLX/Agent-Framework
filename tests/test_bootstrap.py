@@ -46,13 +46,19 @@ def test_configure_rejects_conflicts_before_writing(
     monkeypatch.setattr(configure, "_submodule_warning", _clean_submodule)
 
     with pytest.raises(RuntimeError, match="Unexpected root paths"):
-        configure.configure("Consumer", "Example intent.", "3.12")
+        configure.configure("Consumer", "Example intent.", "3.12", "generic")
 
     assert conflict.read_text(encoding="utf-8") == "sentinel\n"
     assert not (project / "AGENTS.md").exists()
 
 
-@covers("AF-BOOT-005", "AF-BOOT-006", "AF-BOOT-008")
+@covers(
+    "AF-BOOT-005",
+    "AF-BOOT-006",
+    "AF-BOOT-008",
+    "AF-BOOT-011",
+    "AF-BOOT-012",
+)
 def test_configure_creates_deterministic_scaffold(
     tmp_path: Path, monkeypatch: MonkeyPatch
 ):
@@ -63,7 +69,7 @@ def test_configure_creates_deterministic_scaffold(
     monkeypatch.setattr(configure, "framework_root", _framework_override(framework))
     monkeypatch.setattr(configure, "_submodule_warning", _clean_submodule)
 
-    configure.configure("My Project", "Intent kept verbatim.", "3.14")
+    configure.configure("My Project", "Intent kept verbatim.", "3.14", "generic")
 
     assert 'name = "my-project"' in (project / "pyproject.toml").read_text()
     assert 'requires-python = ">=3.14"' in (project / "pyproject.toml").read_text()
@@ -82,6 +88,27 @@ def test_configure_creates_deterministic_scaffold(
         "No implementation milestone"
         in (project / "docs" / "planning" / "roadmap.md").read_text()
     )
+    configured = (project / "agent-framework.toml").read_text(encoding="utf-8")
+    assert '"code/black"' in configured
+    assert '"tests/coverage"' in configured
+    assert '"tests/pytest"' not in configured
+    assert (project / "toolctl.py").is_file()
+    assert (project / "run_verification.py").is_file()
+
+
+@covers("AF-BOOT-011")
+def test_unknown_profile_fails_before_writes(tmp_path: Path, monkeypatch: MonkeyPatch):
+    project = tmp_path / "consumer"
+    framework = _copy_framework(project)
+    (project / ".git").mkdir()
+    (project / ".gitmodules").write_text("submodule\n", encoding="utf-8")
+    monkeypatch.setattr(configure, "framework_root", _framework_override(framework))
+    monkeypatch.setattr(configure, "_submodule_warning", _clean_submodule)
+
+    with pytest.raises(ValueError, match="Unknown bootstrap profile"):
+        configure.configure("Consumer", "Intent", "3.12", "missing")
+
+    assert not (project / "README.md").exists()
 
 
 @covers("AF-BOOT-007")
@@ -91,12 +118,34 @@ def test_configure_rejects_invalid_project_names(name: str):
         configure.normalized_names(name)
 
 
-@covers("AF-BOOT-008")
+@covers("AF-BOOT-011")
 def test_configuration_defaults_to_python_312(monkeypatch: MonkeyPatch):
     monkeypatch.setattr(
         sys,
         "argv",
         ["configure.py", "--project-name", "Consumer", "--intent", "Intent"],
+    )
+
+    with pytest.raises(SystemExit):
+        configure.parse_arguments()
+
+
+@covers("AF-BOOT-008", "AF-BOOT-011")
+def test_configuration_defaults_to_python_312_with_explicit_profile(
+    monkeypatch: MonkeyPatch,
+):
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "configure.py",
+            "--project-name",
+            "Consumer",
+            "--intent",
+            "Intent",
+            "--profile",
+            "generic",
+        ],
     )
 
     arguments = configure.parse_arguments()
@@ -119,7 +168,7 @@ def test_configure_preserves_and_warns_about_ignored_paths(
     monkeypatch.setattr(configure, "framework_root", _framework_override(framework))
     monkeypatch.setattr(configure, "_submodule_warning", _clean_submodule)
 
-    configure.configure("Consumer", "Example intent.", "3.12")
+    configure.configure("Consumer", "Example intent.", "3.12", "generic")
 
     output = capsys.readouterr().out
     assert "WARNING: Preserving ignored pre-existing paths:" in output
@@ -147,7 +196,7 @@ def test_dirty_submodule_returns_warning():
     assert "local modifications" in warning
 
 
-@covers("AF-BOOT-001", "AF-BOOT-003", "AF-BOOT-008")
+@covers("AF-BOOT-001", "AF-BOOT-003", "AF-BOOT-008", "AF-BOOT-011")
 def test_bootstrap_skill_uses_docker_first_host_independent_path():
     skill = (ROOT / "skills" / "bootstrap-project" / "SKILL.md").read_text(
         encoding="utf-8"
@@ -155,6 +204,7 @@ def test_bootstrap_skill_uses_docker_first_host_independent_path():
 
     assert "--build-arg PYTHON_VERSION=" in skill
     assert "python agent-framework/configure.py" in skill
+    assert "--profile generic" in skill
     assert "init_repo" not in skill
     assert "bootstrap process feedback" in skill
 
@@ -195,10 +245,12 @@ def test_documentation_templates_use_markdown_navigation():
 
 @covers("AF-DOC-002")
 def test_docs_verification_uses_markdownlint_and_offline_linkcheck():
-    verification = (ROOT / "tools" / "run_verification.py").read_text(encoding="utf-8")
-    linkcheck = (ROOT / "tools" / "run_linkcheck.py").read_text(encoding="utf-8")
+    verification = (ROOT / "agent-framework.toml").read_text(encoding="utf-8")
+    linkcheck = (
+        ROOT / "tools" / "documentation" / "linkcheck" / "run_linkcheck.py"
+    ).read_text(encoding="utf-8")
 
-    assert '("run_markdownlint.py", ())' in verification
-    assert '("run_linkcheck.py", ())' in verification
+    assert '"documentation/markdownlint"' in verification
+    assert '"documentation/linkcheck"' in verification
     assert '"--offline"' in linkcheck
     assert '"--include-fragments=anchor-only"' in linkcheck

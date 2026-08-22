@@ -1,0 +1,14 @@
+id = "black"
+name = "Black"
+
+[operations.verify]
+script = "run_black.py"
+
+[operations.fix]
+script = "run_black.py"
+arguments = ["--fix"]
+
+[[configuration]]
+default = "defaults/pyproject.toml.template"
+target = "pyproject.toml"
+section = "tool.black"

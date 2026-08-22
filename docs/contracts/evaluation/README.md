@@ -58,11 +58,11 @@ Once matching `@covers(...)` evidence exists, the generated status becomes
 
 An evaluation activity uses one or more of these methods:
 
-- `automated-test` — executable behavior can be demonstrated through public
+- `automated-test` - executable behavior can be demonstrated through public
   interfaces;
-- `inspection` — a structural/public-interface property is established by
+- `inspection` - a structural/public-interface property is established by
   inspecting source, signatures, exported symbols, or absence of an API;
-- `analysis` — the requirement is established by reasoning over several
+- `analysis` - the requirement is established by reasoning over several
   executable observations where no single direct test is sufficient.
 
 Prefer `automated-test` whenever the externally observable obligation can be

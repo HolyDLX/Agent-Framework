@@ -1,7 +1,7 @@
 [project]
 name = "agent-framework"
 python_version = "3.12"
-source_paths = ["configure.py", "tools"]
+source_paths = ["configure.py", "toolctl.py", "tools"]
 test_paths = ["tests"]
 docs_path = "docs"
 readme = "README.md"
@@ -10,18 +10,61 @@ readme = "README.md"
 coverage_min = 0
 line_length = 88
 coverage_exclude_paths = [
-    "tools/run_actionlint.py",
-    "tools/run_black.py",
-    "tools/run_contracts.py",
-    "tools/run_coverage.py",
-    "tools/run_pydoclint.py",
-    "tools/run_pyright.py",
-    "tools/run_pytest.py",
-    "tools/run_ruff.py",
-    "tools/run_shellcheck.py",
-    "tools/run_linkcheck.py",
-    "tools/run_markdownlint.py",
+    "tools/ci/actionlint/run_actionlint.py",
+    "tools/code/black/run_black.py",
+    "tools/code/pydoclint/run_pydoclint.py",
+    "tools/code/pyright/run_pyright.py",
+    "tools/code/ruff/run_ruff.py",
+    "tools/configuration/yamllint/run_yamllint.py",
+    "tools/contracts/traceability/run_contracts.py",
+    "tools/documentation/linkcheck/run_linkcheck.py",
+    "tools/documentation/markdownlint/run_markdownlint.py",
+    "tools/repository/ai_sanitizer/run_ai_sanitizer.py",
+    "tools/shell/shellcheck/run_shellcheck.py",
+    "tools/tests/coverage/run_coverage.py",
+    "tools/tests/pytest/run_pytest.py",
+    "tools/ci/fix_ci.py",
+    "tools/ci/verify_ci.py",
+    "tools/code/fix_code.py",
+    "tools/code/verify_code.py",
+    "tools/configuration/fix_configuration.py",
+    "tools/configuration/verify_configuration.py",
+    "tools/contracts/fix_contracts.py",
+    "tools/contracts/verify_contracts.py",
+    "tools/documentation/fix_documentation.py",
+    "tools/documentation/verify_documentation.py",
+    "tools/repository/fix_repository.py",
+    "tools/repository/verify_repository.py",
+    "tools/shell/fix_shell.py",
+    "tools/shell/verify_shell.py",
+    "tools/tests/fix_tests.py",
+    "tools/tests/verify_tests.py",
     "tools/run_verification.py",
-    "tools/run_yamllint.py",
 ]
 exclude_paths = [".git", ".venv", "coverage", "templates"]
+
+# BEGIN MANAGED TOOL CONFIGURATION
+[tools.code]
+enabled = ["code/black", "code/ruff", "code/pydoclint", "code/pyright"]
+
+[tools.tests]
+enabled = ["tests/coverage"]
+
+[tools.documentation]
+enabled = ["documentation/markdownlint", "documentation/linkcheck"]
+
+[tools.repository]
+enabled = ["repository/ai_sanitizer"]
+
+[tools.contracts]
+enabled = ["contracts/traceability"]
+
+[tools.configuration]
+enabled = ["configuration/yamllint"]
+
+[tools.shell]
+enabled = ["shell/shellcheck"]
+
+[tools.ci]
+enabled = ["ci/actionlint"]
+# END MANAGED TOOL CONFIGURATION

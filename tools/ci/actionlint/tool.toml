@@ -1,0 +1,5 @@
+id = "actionlint"
+name = "actionlint"
+
+[operations.verify]
+script = "run_actionlint.py"

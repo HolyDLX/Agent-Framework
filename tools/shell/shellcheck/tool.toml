@@ -1,0 +1,5 @@
+id = "shellcheck"
+name = "ShellCheck"
+
+[operations.verify]
+script = "run_shellcheck.py"

@@ -1,0 +1,3 @@
+id = "tests"
+verify = "verify_tests.py"
+fix = "fix_tests.py"

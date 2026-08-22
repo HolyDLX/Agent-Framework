@@ -1,0 +1,5 @@
+id = "pytest"
+name = "pytest"
+
+[operations.verify]
+script = "run_pytest.py"

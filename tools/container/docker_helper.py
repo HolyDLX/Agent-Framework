@@ -19,6 +19,7 @@ from _framework import (
     project_image_name,
     project_root,
 )
+from _latest_log import capture, print_tail, write_latest
 
 WORKDIR = "/workspace"
 DEFAULT_MEMORY = "512m"
@@ -60,11 +61,33 @@ def _base_image_name(python_version: str) -> str:
     return f"agent-framework-python:{python_version}-local"
 
 
-def _build_base(image: str, python_version: str) -> int:
-    return subprocess.run(
+def _build_command(
+    command: list[str], label: str, *, verbose: bool, log_chunks: list[str]
+) -> int:
+    root = project_root()
+    result = capture(command, cwd=root)
+    log_path = root / ".agent-framework" / "logs" / "build_container" / "latest.log"
+    log_chunks.extend((f"== {label} ==", result.output.rstrip(), ""))
+    write_latest(log_path, "\n".join(log_chunks).rstrip() + "\n")
+    status = "PASS" if result.returncode == 0 else "FAIL"
+    print(f"{status:<5} {label:<24} {result.duration:.1f}s")
+    if verbose and result.output:
+        print(result.output, end="" if result.output.endswith("\n") else "\n")
+    if result.returncode and not verbose:
+        print("\nLast 40 log lines:")
+        print_tail(result.output)
+        print(f"\nComplete log: {log_path.relative_to(root)}")
+    return result.returncode
+
+
+def _build_base(
+    image: str, python_version: str, *, verbose: bool, log_chunks: list[str]
+) -> int:
+    return _build_command(
         [
             "docker",
             "build",
+            "--progress=plain",
             "--build-arg",
             f"PYTHON_VERSION={python_version}",
             "--tag",
@@ -73,20 +96,25 @@ def _build_base(image: str, python_version: str) -> int:
             str(FRAMEWORK_ROOT / "container" / "Dockerfile"),
             str(FRAMEWORK_ROOT / "container"),
         ],
-        check=False,
-    ).returncode
+        "framework base image",
+        verbose=verbose,
+        log_chunks=log_chunks,
+    )
 
 
-def _build_project(image: str, base_image: str) -> int:
+def _build_project(
+    image: str, base_image: str, *, verbose: bool, log_chunks: list[str]
+) -> int:
     root = project_root()
     dockerfile = root / "Dockerfile"
     if not dockerfile.exists():
         print(f"Missing project Dockerfile: {dockerfile}", file=sys.stderr)
         return 1
-    return subprocess.run(
+    return _build_command(
         [
             "docker",
             "build",
+            "--progress=plain",
             "--tag",
             image,
             "--build-arg",
@@ -95,26 +123,41 @@ def _build_project(image: str, base_image: str) -> int:
             str(dockerfile),
             str(root),
         ],
-        check=False,
-    ).returncode
+        "project image",
+        verbose=verbose,
+        log_chunks=log_chunks,
+    )
 
 
-def ensure_images(*, rebuild: bool = False, build_if_missing: bool = False) -> int:
+def ensure_images(
+    *, rebuild: bool = False, build_if_missing: bool = False, verbose: bool = False
+) -> int:
     if not _docker_available():
         return 125
     config = load_config()
     base_image = _base_image_name(config.python_version)
     project_image = project_image_name(config)
+    log_chunks: list[str] = []
 
     if rebuild or not _image_exists(base_image):
-        result = _build_base(base_image, config.python_version)
+        result = _build_base(
+            base_image,
+            config.python_version,
+            verbose=verbose,
+            log_chunks=log_chunks,
+        )
         if result:
             return result
     elif build_if_missing:
         pass
 
     if rebuild or not _image_exists(project_image):
-        result = _build_project(project_image, base_image)
+        result = _build_project(
+            project_image,
+            base_image,
+            verbose=verbose,
+            log_chunks=log_chunks,
+        )
         if result:
             return result
     return 0
@@ -160,6 +203,7 @@ def _parse() -> argparse.Namespace:
     group.add_argument("--rebuild", action="store_true")
     group.add_argument("--build-if-missing", action="store_true")
     parser.add_argument("--print-image", action="store_true")
+    parser.add_argument("--verbose", action="store_true")
     return parser.parse_args()
 
 
@@ -175,7 +219,11 @@ def main() -> int:
         project = _image_exists(project_image_name(load_config()))
         print(f"base={base} project={project}")
         return 0 if base and project else 1
-    return ensure_images(rebuild=args.rebuild, build_if_missing=args.build_if_missing)
+    return ensure_images(
+        rebuild=args.rebuild,
+        build_if_missing=args.build_if_missing,
+        verbose=args.verbose,
+    )
 
 
 if __name__ == "__main__":

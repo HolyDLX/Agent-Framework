@@ -1,0 +1,5 @@
+id = "yamllint"
+name = "yamllint"
+
+[operations.verify]
+script = "run_yamllint.py"

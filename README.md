@@ -49,6 +49,8 @@ consumer-project/
 ├── agent-framework/                  pinned framework submodule
 ├── .agents/skills/                   thin discovery wrappers
 ├── agent-framework.toml              supported project inputs to the framework
+├── toolctl.py                         thin tool-management wrapper
+├── run_verification.py                thin verification wrapper
 ├── Dockerfile                        project image FROM framework base
 ├── docs/                             project-owned truth
 ├── src/                              project source
@@ -74,22 +76,22 @@ On hosts with only Git and Docker, run framework verification directly inside
 the project development image:
 
 ```text
-docker run --rm --mount type=bind,source=<project-root>,target=/workspace --workdir /workspace <project-development-image> python agent-framework/tools/run_verification.py
+docker run --rm --mount type=bind,source=<project-root>,target=/workspace --workdir /workspace <project-development-image> python run_verification.py
 ```
 
 When host Python is intentionally available, the framework also provides the
 convenience dispatcher:
 
 ```text
-python agent-framework/tools/run_verification.py --container
+python run_verification.py --container
 ```
 
-Focused groups append `code`, `docs`, `testing`, `contracts`, or `repository`
-to the verification command.
+Focused runs append a configured category such as `code`, `documentation`,
+`tests`, `contracts`, or `repository` to the verification command.
 
-The `docs` group lints Markdown and validates repository-local Markdown links
-offline. Documentation navigation uses ordinary Markdown links; Sphinx/MyST is
-not part of the framework toolchain.
+The `documentation` category lints Markdown and validates repository-local
+Markdown links offline. Documentation navigation uses ordinary Markdown links;
+Sphinx/MyST is not part of the framework toolchain.
 
 ## Framework repository pre-commit gate
 

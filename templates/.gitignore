@@ -5,10 +5,12 @@ __pycache__/
 .ruff_cache/
 .pyright/
 .mypy_cache/
-coverage/
+/coverage/
 htmlcov/
 .coverage
 coverage.xml
+.agent-framework/
+.agent-framework-pyright.json
 *.egg-info/
 dist/
 build/

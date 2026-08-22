@@ -131,6 +131,16 @@ def existing_paths(root: Path, paths: tuple[str, ...]) -> list[str]:
     return [path for path in paths if (root / path).exists()]
 
 
+def has_project_tool_config(tool: str, root: Path | None = None) -> bool:
+    """Return whether pyproject.toml contains a local table for one tool."""
+
+    path = (root or project_root()) / "pyproject.toml"
+    if not path.is_file():
+        return False
+    parsed = _table(tomllib.loads(path.read_text(encoding="utf-8")))
+    return tool in _table(parsed.get("tool"))
+
+
 def black_target_version(config: FrameworkConfig | None = None) -> str:
     """Return Black target-version spelling for the configured Python version."""
     version = (config or load_config()).python_version.strip()

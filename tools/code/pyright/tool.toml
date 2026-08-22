@@ -1,0 +1,5 @@
+id = "pyright"
+name = "Pyright"
+
+[operations.verify]
+script = "run_pyright.py"

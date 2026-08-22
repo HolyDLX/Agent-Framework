@@ -43,7 +43,7 @@ Select verification by what changed, not by habit.
 | Public behavior governed by a contract | relevant contract tests plus contract traceability |
 | Cross-module behavior | relevant integration tests |
 | Formatting, lint, typing, or docstrings | `code` verification group or the failing diagnostic runner |
-| Documentation only | `docs` verification group |
+| Documentation only | `documentation` verification category |
 | Contract/evaluation/coverage metadata | `contracts` verification group |
 | Repository scripts/configuration | `repository` verification group |
 | Completed implementation slice touching several concerns | all relevant focused groups |
@@ -58,32 +58,32 @@ crosses their boundary.
 Run a specific test file:
 
 ```text
-python agent-framework/tools/run_pytest.py --container tests/unit/test_example.py -q
+python agent-framework/tools/tests/pytest/run_pytest.py --container tests/unit/test_example.py -q
 ```
 
 Run a selected test or expression:
 
 ```text
-python agent-framework/tools/run_pytest.py --container tests/unit/test_example.py -k name -q
+python agent-framework/tools/tests/pytest/run_pytest.py --container tests/unit/test_example.py -k name -q
 ```
 
 Run the relevant aggregate verification group when the implementation slice is
 broader:
 
 ```text
-python agent-framework/tools/run_verification.py --container code
-python agent-framework/tools/run_verification.py --container testing
-python agent-framework/tools/run_verification.py --container docs
-python agent-framework/tools/run_verification.py --container contracts
-python agent-framework/tools/run_verification.py --container repository
+python run_verification.py --container code
+python run_verification.py --container tests
+python run_verification.py --container documentation
+python run_verification.py --container contracts
+python run_verification.py --container repository
 ```
 
 Use an individual framework runner when diagnosing one gate, for example:
 
 ```text
-python agent-framework/tools/run_ruff.py --container
-python agent-framework/tools/run_pyright.py --container
-python agent-framework/tools/run_pytest.py --container <selection>
+python agent-framework/tools/code/ruff/run_ruff.py --container
+python agent-framework/tools/code/pyright/run_pyright.py --container
+python agent-framework/tools/tests/pytest/run_pytest.py --container <selection>
 ```
 
 ## Contract-aware verification
@@ -103,7 +103,7 @@ When externally observable behavior is governed by a contract:
 4. Check contract verification:
 
    ```text
-   python agent-framework/tools/run_verification.py --container contracts
+   python run_verification.py --container contracts
    ```
 
 5. Do not treat an `AUTOMATED` or `MIXED` traceability row as proof of semantic adequacy. For
@@ -159,7 +159,7 @@ that slice before moving on when practical.
 Before milestone completion or handover, always run the canonical complete gate:
 
 ```text
-python agent-framework/tools/run_verification.py --container
+python run_verification.py --container
 ```
 
 Passing focused verification never replaces this final combined result.

@@ -64,7 +64,7 @@ Copy this prompt to the agent and replace the intent placeholder:
 > **<describe the project goal here>**
 >
 > Derive a project name from the repository root or intent. Configure the
-> repository with the supplied intent, the default Python version unless I
+> repository with the explicit `generic` profile, the supplied intent, the default Python version unless I
 > specify another supported version, and the minimal executable package/smoke
 > test scaffold. Build the project development container and run complete
 > framework verification.

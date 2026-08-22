@@ -9,4 +9,4 @@ WORKDIR /workspace
 COPY . /workspace
 RUN python -m pip install --editable .
 
-CMD ["python", "agent-framework/tools/run_verification.py"]
+CMD ["python", "run_verification.py"]

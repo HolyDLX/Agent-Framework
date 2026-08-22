@@ -1,0 +1,3 @@
+id = "configuration"
+verify = "verify_configuration.py"
+fix = "fix_configuration.py"

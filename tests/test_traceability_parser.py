@@ -20,10 +20,10 @@ def test_requirement_parser_ignores_fenced_examples(tmp_path: Path) -> None:
     path.write_text(
         "# X\n\n"
         "```markdown\n"
-        "**FAKE-X-001** — fake\n"
+        "**FAKE-X-001** - fake\n"
         "Type: `behavioral`\n"
         "```\n\n"
-        "**REAL-X-001** — real\n"
+        "**REAL-X-001** - real\n"
         "Type: `structural`\n",
         encoding="utf-8",
     )
@@ -62,7 +62,7 @@ def test_planned_automated_evidence_does_not_require_test_evidence(
     contract = tmp_path / "contract.md"
     contract.write_text(
         "# Contract\n\n"
-        "**REAL-X-001** — behavior will be implemented later.\n"
+        "**REAL-X-001** - behavior will be implemented later.\n"
         "Type: `behavioral`\n",
         encoding="utf-8",
     )
@@ -90,7 +90,7 @@ def test_unplanned_automated_evidence_still_requires_covers(
     contract = tmp_path / "contract.md"
     contract.write_text(
         "# Contract\n\n"
-        "**REAL-X-001** — behavior is required now.\n"
+        "**REAL-X-001** - behavior is required now.\n"
         "Type: `behavioral`\n",
         encoding="utf-8",
     )
@@ -129,7 +129,7 @@ def test_manual_evaluation_does_not_require_test_evidence(tmp_path: Path) -> Non
     contract = tmp_path / "contract.md"
     contract.write_text(
         "# Contract\n\n"
-        "**REAL-X-001** — repository shape is constrained.\n"
+        "**REAL-X-001** - repository shape is constrained.\n"
         "Type: `structural`\n",
         encoding="utf-8",
     )

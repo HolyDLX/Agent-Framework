@@ -21,3 +21,5 @@ exclude_paths = [
     "agent-framework",
     "coverage",
 ]
+
+${tool_configuration}

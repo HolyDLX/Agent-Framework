@@ -1,0 +1,5 @@
+id = "pydoclint"
+name = "pydoclint"
+
+[operations.verify]
+script = "run_pydoclint.py"

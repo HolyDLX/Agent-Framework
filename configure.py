@@ -12,6 +12,9 @@ import subprocess
 import sys
 from pathlib import Path
 from string import Template
+from typing import cast
+
+import tomllib
 
 SUPPORTED_PYTHON_VERSIONS = ("3.12", "3.14")
 ALLOWED_ROOT_ENTRIES = frozenset({".git", ".gitmodules", "agent-framework"})
@@ -23,6 +26,8 @@ RENDERED_DESTINATIONS = {
     "rendered/package/__init__.py.template": "src/{package_name}/__init__.py",
     "rendered/package/main.py.template": "src/{package_name}/main.py",
     "rendered/tests/test_main.py.template": "tests/test_main.py",
+    "rendered/toolctl.py.template": "toolctl.py",
+    "rendered/run_verification.py.template": "run_verification.py",
     "docs/architecture/README.md": "docs/architecture/README.md",
     "docs/development/container.md": "docs/development/container.md",
 }
@@ -34,13 +39,80 @@ def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--project-name", required=True, help="project display name")
     parser.add_argument("--intent", required=True, help="initial project intent")
+    parser.add_argument("--profile", help="required bootstrap profile name")
     parser.add_argument(
         "--python-version",
         choices=SUPPORTED_PYTHON_VERSIONS,
         default="3.12",
         help="supported Python minor version (default: 3.12)",
     )
-    return parser.parse_args()
+    arguments = parser.parse_args()
+    if arguments.profile is None:
+        available = sorted(
+            path.parent.name
+            for path in Path(__file__).resolve().parent.glob("profiles/*/profile.toml")
+        )
+        parser.error(
+            "a bootstrap profile is required; available profiles: "
+            + (", ".join(available) or "none")
+        )
+    return arguments
+
+
+def load_profile(root: Path, name: str) -> tuple[Path, str]:
+    """Return the validated profile template root and rendered tool section."""
+
+    normalized = name.strip().lower()
+    if re.fullmatch(r"[a-z0-9][a-z0-9_-]*", normalized) is None:
+        raise ValueError(f"Invalid bootstrap profile: {name!r}")
+    profile_path = root / "profiles" / normalized / "profile.toml"
+    if not profile_path.is_file():
+        available = sorted(
+            path.parent.name for path in root.glob("profiles/*/profile.toml")
+        )
+        choices = ", ".join(available) or "none"
+        raise ValueError(
+            f"Unknown bootstrap profile {normalized!r}. Available: {choices}"
+        )
+    raw = tomllib.loads(profile_path.read_text(encoding="utf-8"))
+    template_value = raw.get("template_root")
+    if not isinstance(template_value, str):
+        raise TypeError(f"Profile {normalized!r} has no template_root")
+    template_root = (profile_path.parent / template_value).resolve()
+    if root.resolve() not in template_root.parents or not template_root.is_dir():
+        raise ValueError(f"Profile {normalized!r} has an invalid template_root")
+    raw_tools = raw.get("tools")
+    if not isinstance(raw_tools, dict):
+        raise TypeError(f"Profile {normalized!r} has no [tools] assignments")
+    lines = ["# BEGIN MANAGED TOOL CONFIGURATION"]
+    for category, value in cast(dict[object, object], raw_tools).items():
+        if not isinstance(category, str) or not isinstance(value, dict):
+            raise TypeError(f"Profile {normalized!r} has invalid tool assignments")
+        enabled = cast(dict[object, object], value).get("enabled")
+        if not isinstance(enabled, list) or not all(
+            isinstance(item, str) for item in cast(list[object], enabled)
+        ):
+            raise TypeError(
+                f"Profile {normalized!r} has invalid tools.{category}.enabled"
+            )
+        lines.extend((f"[tools.{category}]", "enabled = ["))
+        for item in cast(list[object], enabled):
+            identifier = cast(str, item)
+            parts = identifier.split("/")
+            if (
+                len(parts) != 2
+                or not (root / "tools" / parts[0] / parts[1] / "tool.toml").is_file()
+            ):
+                raise ValueError(
+                    f"Profile {normalized!r} references unavailable tool "
+                    f"{identifier!r}"
+                )
+            lines.append(f'    "{identifier}",')
+        lines.extend(("]", ""))
+    if lines[-1] == "":
+        lines.pop()
+    lines.append("# END MANAGED TOOL CONFIGURATION")
+    return template_root, "\n".join(lines)
 
 
 def framework_root() -> Path:
@@ -205,11 +277,14 @@ def _rendered_files(
     return result
 
 
-def configure(project_name: str, intent: str, python_version: str) -> None:
+def configure(
+    project_name: str, intent: str, python_version: str, profile: str
+) -> None:
     """Create the complete initial scaffold after successful preflight."""
 
     root = framework_root()
     project_root = root.parent
+    template_root, tool_configuration = load_profile(root, profile)
     display_name, distribution_name, package_name = normalized_names(project_name)
     if not intent.strip():
         raise ValueError("--intent must not be empty.")
@@ -223,8 +298,8 @@ def configure(project_name: str, intent: str, python_version: str) -> None:
         "intent": intent,
         "intent_toml": json.dumps(intent, ensure_ascii=False),
         "image_name": f"agent-{distribution_name}-development",
+        "tool_configuration": tool_configuration,
     }
-    template_root = root / "templates"
     static = [
         (source.relative_to(template_root), source)
         for source in _static_templates(template_root)
@@ -277,6 +352,7 @@ def configure(project_name: str, intent: str, python_version: str) -> None:
     print(f"Distribution name: {distribution_name}")
     print(f"Import package:    {package_name}")
     print(f"Python version:    {python_version}")
+    print(f"Bootstrap profile: {profile.strip().lower()}")
 
 
 def main() -> int:
@@ -284,8 +360,8 @@ def main() -> int:
 
     args = parse_arguments()
     try:
-        configure(args.project_name, args.intent, args.python_version)
-    except (OSError, RuntimeError, ValueError) as exc:
+        configure(args.project_name, args.intent, args.python_version, args.profile)
+    except (OSError, RuntimeError, TypeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
     return 0

@@ -6,7 +6,7 @@ Requirement syntax
 A normative requirement is a normal Markdown paragraph beginning with a stable
 ID in bold followed by an em dash. The final line declares its requirement type:
 
-    **SET-PRE-012** — Any exception raised by a pre-commit hook aborts the
+    **SET-PRE-012** - Any exception raised by a pre-commit hook aborts the
     transaction and leaves the committed configuration unchanged.
     Type: `behavioral`
 
@@ -74,7 +74,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 REQUIREMENT_START_RE = re.compile(
-    r"^\*\*(?P<id>[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-\d{3})\*\*\s+—\s+(?P<text>.+?)\s*$"
+    r"^\*\*(?P<id>[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-\d{3})\*\*\s+-\s+(?P<text>.+?)\s*$"
 )
 REQUIREMENT_TYPE_RE = re.compile(r"^Type:\s+`(?P<type>[a-z-]+)`\s*$")
 LOOKS_LIKE_REQUIREMENT_RE = re.compile(r"^\*\*([A-Z][A-Z0-9-]*-\d+)\*\*")
@@ -226,7 +226,7 @@ def parse_contract(path: Path) -> list[Requirement]:
         if suspicious:
             raise TraceabilityError(
                 f"{path}:{i + 1}: requirement-like declaration does not use "
-                f"the required '**ID** — text' form"
+                f"the required '**ID** - text' form"
             )
 
         i += 1

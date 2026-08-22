@@ -1,0 +1,9 @@
+id = "traceability"
+name = "Contract traceability"
+
+[operations.verify]
+script = "run_contracts.py"
+
+[operations.fix]
+script = "run_contracts.py"
+arguments = ["--fix"]

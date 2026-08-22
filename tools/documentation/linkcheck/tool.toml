@@ -1,0 +1,5 @@
+id = "linkcheck"
+name = "lychee link check"
+
+[operations.verify]
+script = "run_linkcheck.py"

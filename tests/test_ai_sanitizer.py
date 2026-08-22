@@ -5,6 +5,7 @@ from tests.util.contract import covers
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "tools" / "repository" / "ai_sanitizer"))
 
 from run_ai_sanitizer import milestone_reference_lines
 

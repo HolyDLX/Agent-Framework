@@ -1,0 +1,3 @@
+id = "ci"
+verify = "verify_ci.py"
+fix = "fix_ci.py"

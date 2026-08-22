@@ -1,0 +1,3 @@
+id = "contracts"
+verify = "verify_contracts.py"
+fix = "fix_contracts.py"

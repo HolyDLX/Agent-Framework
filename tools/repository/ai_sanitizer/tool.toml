@@ -1,0 +1,10 @@
+id = "ai_sanitizer"
+name = "AI sanitizer"
+
+[operations.verify]
+script = "run_ai_sanitizer.py"
+arguments = ["--strict"]
+
+[operations.fix]
+script = "run_ai_sanitizer.py"
+arguments = ["--fix"]

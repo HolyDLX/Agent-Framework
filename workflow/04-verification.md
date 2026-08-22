@@ -8,7 +8,7 @@ prerequisite. On a Docker-only host, run the same framework runner inside the
 already-built project development image and omit `--container`, for example:
 
 ```text
-docker run --rm --mount type=bind,source=<project-root>,target=/workspace --workdir /workspace <project-development-image> python agent-framework/tools/run_verification.py
+docker run --rm --mount type=bind,source=<project-root>,target=/workspace --workdir /workspace <project-development-image> python run_verification.py
 ```
 
 Use the host-appropriate mount spelling. Verification semantics are defined by
@@ -39,7 +39,7 @@ Do not substitute host tests for the required verification.
 The required default verification command is:
 
 ```text
-python agent-framework/tools/run_verification.py --container
+python run_verification.py --container
 ```
 
 Verification scripts may take longer than other repository instructions,
@@ -69,21 +69,17 @@ specific failing verification gate.
 Available diagnostic runners include:
 
 ```text
-python agent-framework/tools/run_black.py --container
-python agent-framework/tools/run_ruff.py --container
-python agent-framework/tools/run_pydoclint.py --container
-python agent-framework/tools/run_ai_sanitizer.py --container
-python agent-framework/tools/run_pyright.py --container
-python agent-framework/tools/run_pytest.py --container
-python agent-framework/tools/run_coverage.py --container
-python agent-framework/tools/run_markdownlint.py --container
-python agent-framework/tools/run_linkcheck.py --container
+python agent-framework/tools/code/verify_code.py --container
+python agent-framework/tools/tests/verify_tests.py --container
+python agent-framework/tools/documentation/verify_documentation.py --container
+python agent-framework/tools/contracts/verify_contracts.py --container
+python agent-framework/tools/repository/verify_repository.py --container
 ```
 
 After making a diagnostic fix, rerun the combined verification:
 
 ```text
-python agent-framework/tools/run_verification.py --container
+python run_verification.py --container
 ```
 
 A set of passing individual runners does not replace the combined result.
@@ -142,11 +138,11 @@ The aggregate runner supports focused verification groups.
 For example:
 
 ```text
-python agent-framework/tools/run_verification.py --container docs
-python agent-framework/tools/run_verification.py --container code
-python agent-framework/tools/run_verification.py --container testing
-python agent-framework/tools/run_verification.py --container contracts
-python agent-framework/tools/run_verification.py --container repository
+python run_verification.py --container documentation
+python run_verification.py --container code
+python run_verification.py --container tests
+python run_verification.py --container contracts
+python run_verification.py --container repository
 ```
 
 Use focused verification when diagnosing a specific area.

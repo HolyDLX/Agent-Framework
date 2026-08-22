@@ -141,17 +141,18 @@ Requirements: `AF-TOOL-001`
 Method: `automated-test`
 
 Load framework configuration for Python 3.12 and verify the framework resolves
-Black's target spelling to `py312`. Inspect `run_black.py` to verify that target
-is passed explicitly.
+Black's target spelling to `py312`. Inspect the Black runner to verify that
+target is passed explicitly only when local Black configuration is absent.
 
 ## EA-AF-TOOL-002
 
 Requirements: `AF-TOOL-002`
-Method: `inspection`
+Method: `automated-test`, `inspection`
 
-Inspect `run_ruff.py` and verify the framework extends Ruff ignores with
-`EXE002`, documenting this as a cross-platform bind-mount accommodation rather
-than a project-local Ruff configuration.
+Inspect the Ruff runner and verify the framework extends Ruff ignores with
+`EXE002` when local Ruff configuration is absent, documenting this as a
+cross-platform bind-mount accommodation rather than a project-local Ruff
+configuration.
 
 ## EA-AF-TOOL-003
 
@@ -172,6 +173,99 @@ Parse an evaluation activity that declares a `Method:` line containing `automate
 the `Evidence:` value `planned` without any matching `@covers(...)` declaration. Verify
 traceability validation succeeds and the generated evaluation status is
 `PLANNED-AUTOMATED`.
+
+## EA-AF-TOOL-005
+
+Requirements: `AF-TOOL-005`
+Method: `automated-test`, `inspection`
+
+Create category and tool fixtures with valid and invalid manifests, inspect the
+resulting discovery inventory, and verify category entry points use that
+inventory rather than a hardcoded runner list.
+
+## EA-AF-TOOL-006
+
+Requirements: `AF-TOOL-006`
+Method: `automated-test`
+
+Configure multiple categories and tools in a deliberate non-alphabetic order
+and verify recorded subprocess execution follows that order.
+
+## EA-AF-TOOL-007
+
+Requirements: `AF-TOOL-007`
+Method: `automated-test`
+
+Configure a duplicate assignment and verify the tool executes once, a warning
+is emitted, and verification remains successful.
+
+## EA-AF-TOOL-008
+
+Requirements: `AF-TOOL-008`
+Method: `automated-test`
+
+Use fake fix and verify operations including failures. Verify all fixes precede
+all checks, later operations still execute, and the final status fails.
+
+## EA-AF-TOOL-009
+
+Requirements: `AF-TOOL-009`
+Method: `automated-test`
+
+Configure an unavailable canonical tool identifier and verify the default run
+fails before tool execution while `--ignore-unavailable` warns and continues.
+
+## EA-AF-TOOL-010
+
+Requirements: `AF-TOOL-010`
+Method: `automated-test`
+
+Exercise enable, category assignment, idempotent enable, disable, and duplicate
+cleanup. Verify tool ordering and byte-preservation outside the managed section.
+
+## EA-AF-TOOL-011
+
+Requirements: `AF-TOOL-011`
+Method: `automated-test`
+
+Exercise show, diff, deployment, and forced reset for standalone files and TOML
+sections. Verify existing tool configuration requires force and unrelated file
+content is preserved.
+
+## EA-AF-TOOL-012
+
+Requirements: `AF-TOOL-012`
+Method: `automated-test`
+
+Run successful and failing commands through the shared process logger. Verify
+atomic latest-log replacement, concise output, raw failure tail, and log path.
+Inspect Docker build integration with the shared logger.
+
+## EA-AF-TOOL-013
+
+Requirements: `AF-TOOL-013`
+Method: `automated-test`
+
+Run a non-applicable tool and a category fix phase containing a verify-only
+tool. Verify both produce successful skip results with reasons.
+
+## EA-AF-BOOT-011
+
+Requirements: `AF-BOOT-011`
+Method: `automated-test`
+
+Verify configuration rejects a missing or unknown profile before writes and
+that the `generic` profile creates the executable scaffold and its exact initial
+tool assignments.
+
+## EA-AF-BOOT-012
+
+Requirements: `AF-BOOT-012`
+Method: `automated-test`, `inspection`
+
+Inspect and execute the generated wrappers against a controlled framework
+entry point. Verify arguments and exit status are forwarded without duplicating
+framework logic.
 
 ## EA-AF-DOC-001
 
@@ -197,7 +291,7 @@ Requirements: `AF-DOC-002`
 Method: `automated-test`, `inspection`
 
 Inspect the aggregate verification runner and documentation runners. Verify the
-`docs` group invokes both Markdown linting and local-link validation, and verify
+`documentation` category invokes both Markdown linting and local-link validation, and verify
 the link checker uses lychee offline so external network availability cannot
 affect the documentation gate.
 

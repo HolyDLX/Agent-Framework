@@ -1,0 +1,13 @@
+id = "markdownlint"
+name = "markdownlint-cli2"
+
+[operations.verify]
+script = "run_markdownlint.py"
+
+[operations.fix]
+script = "run_markdownlint.py"
+arguments = ["--fix"]
+
+[[configuration]]
+default = "markdownlint-cli2.yaml"
+target = ".markdownlint-cli2.yaml"

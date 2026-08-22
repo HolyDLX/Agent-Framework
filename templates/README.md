@@ -18,5 +18,5 @@ python -m ${package_name}.main
 Run complete verification inside the project development image:
 
 ```text
-docker run --rm --mount type=bind,source=<project-root>,target=/workspace --workdir /workspace ${image_name} python agent-framework/tools/run_verification.py
+docker run --rm --mount type=bind,source=<project-root>,target=/workspace --workdir /workspace ${image_name} python run_verification.py
 ```

@@ -1,0 +1,14 @@
+id = "ruff"
+name = "Ruff"
+
+[operations.verify]
+script = "run_ruff.py"
+
+[operations.fix]
+script = "run_ruff.py"
+arguments = ["--fix"]
+
+[[configuration]]
+default = "defaults/pyproject.toml"
+target = "pyproject.toml"
+section = "tool.ruff"

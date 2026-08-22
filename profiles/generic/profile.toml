@@ -1,0 +1,21 @@
+name = "generic"
+description = "Minimal Python project with a Hello World entry point"
+template_root = "../../templates"
+
+[tools.code]
+enabled = ["code/black", "code/ruff", "code/pydoclint", "code/pyright"]
+
+[tools.tests]
+enabled = ["tests/coverage"]
+
+[tools.documentation]
+enabled = ["documentation/markdownlint", "documentation/linkcheck"]
+
+[tools.repository]
+enabled = ["repository/ai_sanitizer"]
+
+[tools.contracts]
+enabled = ["contracts/traceability"]
+
+[tools.configuration]
+enabled = ["configuration/yamllint"]

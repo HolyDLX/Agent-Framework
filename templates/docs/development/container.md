@@ -21,7 +21,7 @@ docker build --tag ${image_name} --build-arg AGENT_FRAMEWORK_BASE_IMAGE=agent-fr
 On Linux, run writable bind mounts with the host identity and a writable home:
 
 ```text
-docker run --rm --user "$$(id -u):$$(id -g)" --env HOME=/tmp --mount type=bind,source="$$PWD",target=/workspace --workdir /workspace ${image_name} python agent-framework/tools/run_verification.py
+docker run --rm --user "$$(id -u):$$(id -g)" --env HOME=/tmp --mount type=bind,source="$$PWD",target=/workspace --workdir /workspace ${image_name} python run_verification.py
 ```
 
 When host Python is intentionally available, this convenience helper performs
