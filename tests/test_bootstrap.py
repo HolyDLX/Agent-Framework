@@ -12,17 +12,36 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import configure
 
+GENERIC_TOOL_MANIFESTS = (
+    "code/black",
+    "code/ruff",
+    "code/pydoclint",
+    "code/pyright",
+    "tests/coverage",
+    "documentation/markdownlint",
+    "documentation/linkcheck",
+    "repository/ai_sanitizer",
+    "contracts/traceability",
+    "configuration/yamllint",
+)
+
 
 def _copy_framework(project: Path) -> Path:
     import shutil
 
     framework = project / "agent-framework"
     project.mkdir()
-    shutil.copytree(
-        ROOT,
-        framework,
-        ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache", "*.pyc"),
-    )
+    shutil.copytree(ROOT / "templates", framework / "templates")
+    profile = framework / "profiles" / "generic" / "profile.toml"
+    profile.parent.mkdir(parents=True)
+    shutil.copy2(ROOT / "profiles" / "generic" / "profile.toml", profile)
+    for identifier in GENERIC_TOOL_MANIFESTS:
+        manifest = framework / "tools" / identifier / "tool.toml"
+        manifest.parent.mkdir(parents=True)
+        shutil.copy2(
+            ROOT / "tools" / identifier / "tool.toml",
+            manifest,
+        )
     return framework
 
 
